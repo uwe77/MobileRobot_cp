@@ -4,6 +4,7 @@ import RPi.GPIO as GPIO
 from std_msgs.msg import Int32
 
 light_v = 0
+last_light_v = 0
 dir = 0.0
 sw_mid = False
 sw_right = False
@@ -33,11 +34,13 @@ def main():
 
     while not rospy.is_shutdown():
         try:
+            read_info()
             if state == 0: #all stop
                 if state != last_state:
                     last_state = state
                     left_speed = 0
                     right_speed = 0
+                    last_light_v = 0
                     pub_L.publish(left_speed)
                     pub_R.publish(right_speed)
                 else:
@@ -46,6 +49,7 @@ def main():
             elif state == 1: # go back function dont change last_state
                 left_speed = -mid_speed
                 right_speed = -mid_speed
+                last_light_v = 0
                 pub_L.publish(left_speed)
                 pub_R.publish(right_speed)
                 count += 1
@@ -76,6 +80,9 @@ def main():
                     elif sw_right:
                         back_situation = 1
                         state = 1
+                if light_v < last_light_v:
+                    state = 3
+                last_light_v = light_v
             elif state == 3: #forward but right is faster
                 if last_state != state:
                     last_state = state
@@ -93,7 +100,9 @@ def main():
                     elif sw_right:
                         back_situation = 1
                         state = 1
-                    
+                if light_v < last_light_v:
+                    state = 2
+                last_light_v = light_v
             elif state == 4: # trun 180 then state = last_state
                 last_state = state
                 left_speed = mid_speed
@@ -105,6 +114,8 @@ def main():
                     count = 0
                     state = last_state
                     last_state = 4
+            if sw_mid:
+                state = 0
         except ValueError:
             pass
 
