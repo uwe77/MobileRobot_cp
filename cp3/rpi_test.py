@@ -134,8 +134,10 @@ def main():
             
             if sw_mid == GPIO.HIGH:
                 state_index = 0
-            # print "right_v: ", right_speed
-            # print "left_v:  ", left_speed
+
+            print "current state: ", state[state_index], "count: ", count
+            print "right_v: ", right_speed, "left_v:  ", left_speed
+            
             pub_L.publish(left_speed)
             pub_R.publish(right_speed)
             rospy.sleep(0.5)
