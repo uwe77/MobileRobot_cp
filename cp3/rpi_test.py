@@ -63,42 +63,43 @@ def main():
     while not rospy.is_shutdown():
         try:
             if state[state_index] == 0: # all stop
-                if state != last_state:
-                    last_state = state
-                    set_motorLnR_v(0,0)
+                last_state = 0
+                set_motorLnR_v(0,0)
+                if sw_mid == GPIO.LOW:
+                    state_index = 1
                     last_light_value = 1000
-                else:
-                    if sw_mid == GPIO.LOW:
-                        last_state = 0
-                        state_index = 1
+
             elif state[state_index] == 1: # left speed faster
                 set_motorLnR_v(mid_speed+diff_speed,mid_speed)
+                last_state = 1
+                last_light_value = light_value
                 if sw_left == GPIO.HIGH and sw_right == GPIO.HIGH:
-                    last_state = 1
                     state_index = 4
                 elif sw_left == GPIO.HIGH or sw_right == GPIO.HIGH:
-                    last_state = 1
                     state_index = 3
                 if light_value > last_light_value + light_tol:
-                    last_state = 1
+                    last_light_value = 1000
                     state_index = 2
+
             elif state[state_index] == 2: # right speed faster
                 set_motorLnR_v(mid_speed,mid_speed+diff_speed)
+                last_state = 2
+                last_light_value = light_value
                 if sw_left == GPIO.HIGH and sw_right == GPIO.HIGH:
-                    last_state = 2
                     state_index = 4
                 elif sw_left == GPIO.HIGH or sw_right == GPIO.HIGH:
-                    last_state = 2
                     state_index = 3
                 if light_value > last_light_value + light_tol:
-                    last_state = 2
+                    last_light_value = 1000
                     state_index = 1
+
             elif state[state_index] == 3: # single side sw on go back
                 if count == 0:
                     count += 1
                     set_motorLnR_v(-mid_speed + diff_speed,-mid_speed +diff_speed)
                 elif count >= 10000:
                     count = 0
+                    last_light_value = 1000
                     if last_state == 1:
                         state_index = 2
                         last_state = 3
@@ -107,6 +108,7 @@ def main():
                         last_state = 3
                 elif count < 10000:
                     count += 1
+                    
             elif state[state_index] == 4: # both side sw on go back then state5
                 if count == 0:
                     count += 1
@@ -117,12 +119,14 @@ def main():
                     last_state = 4
                 elif count < 10000:
                     count += 1
+
             elif state[state_index] == 5: # turn around
                 if count == 0:
                     count += 1
                     set_motorLnR_v(-mid_speed + diff_speed,mid_speed - diff_speed)
                 elif count >= 10000:
                     count = 0
+                    last_light_value = 1000
                     state_index = last_state
                     last_state = 5
                 elif count < 10000:
