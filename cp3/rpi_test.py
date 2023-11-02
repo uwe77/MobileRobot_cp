@@ -93,7 +93,7 @@ def main():
                     last_light_value = 1000
                     state_index = 1
 
-            elif state[state_index] == 3: # single side sw on go back
+            elif state[state_index] == 3: # single side sw on, go back
                 if count == 0:
                     count += 1
                     set_motorLnR_v(-mid_speed + diff_speed,-mid_speed +diff_speed)
@@ -120,7 +120,7 @@ def main():
                 elif count < 10000:
                     count += 1
 
-            elif state[state_index] == 5: # turn around
+            elif state[state_index] == 5: # turn around then state_index = last_state
                 if count == 0:
                     count += 1
                     set_motorLnR_v(-mid_speed + diff_speed,mid_speed - diff_speed)
