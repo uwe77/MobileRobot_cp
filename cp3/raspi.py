@@ -45,7 +45,9 @@ def main():
     rospy.Subscriber('lm393_data', Int32, read_info)
     pub_L = rospy.Publisher('motor_v_left', Int32, queue_size=1)
     pub_R = rospy.Publisher('motor_v_right', Int32, queue_size=1)
-
+    state = 0
+    last_state = 2
+    back_situation = 0
     while not rospy.is_shutdown():
         try:
             if state == 0: # all stop
@@ -132,6 +134,8 @@ def main():
             rospy.sleep(0.5)
         except ValueError:
             pass
-
+        finally:
+            # Clean up and reset GPIO settings
+            GPIO.cleanup()
 if __name__ == '__main__':
     main()

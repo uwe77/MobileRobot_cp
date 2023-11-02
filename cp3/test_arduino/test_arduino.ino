@@ -4,12 +4,12 @@
 
 // pin setting
 // left motor
-int pin_IN1 = 5;
-int pin_IN2 = 4;
-int ENA = 6;
+int pin_IN1 = 10;
+int pin_IN2 = 9;
+int ENA = 11;
 
-int pin_encoder_LA = 0;
-int pin_encoder_LB = 7;
+int pin_encoder_LA = 1;
+int pin_encoder_LB = 8;
 
 int count_L = 0;
 double abs_count_L = double(abs(count_L));
@@ -18,12 +18,12 @@ double Setpoint_L = 0;
 int SpdMsgL = 0; // data of speed message for left motor
 
 // right motor
-int pin_IN3 = 10;
-int pin_IN4 = 9;
-int ENB = 11;
+int pin_IN3 = 5;
+int pin_IN4 = 4;
+int ENB = 6;
 
-int pin_encoder_RA = 1;
-int pin_encoder_RB = 8;
+int pin_encoder_RA = 0;
+int pin_encoder_RB = 7;
 
 int count_R = 0;
 double abs_count_R = double(abs(count_R));
@@ -42,7 +42,7 @@ PID motorLPID(&abs_count_L, &pwm_L, &Setpoint_L, Kp, Ki, Kd, DIRECT);
 PID motorRPID(&abs_count_R, &pwm_R, &Setpoint_R, Kp, Ki, Kd, DIRECT);
 
 // ROS
-ros::NodeHandle nh;
+// ros::NodeHandle nh;
 std_msgs::Int32 motor_v_L;// topic of left motor speed
 std_msgs::Int32 motor_v_R;// topic of right motor speed
 
@@ -93,7 +93,7 @@ void setup(){
 }
 
 void loop(){
-    lm393_info = analogRead(lm393_pin);
+    int lm393_info = analogRead(lm393_pin);
     input_msg.data = int(lm393_info);
     lm393_pub.publish(&input_msg);
     
