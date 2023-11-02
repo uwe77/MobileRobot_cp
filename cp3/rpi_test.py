@@ -118,7 +118,9 @@ def main():
                 state = 0
         except ValueError:
             pass
-
+        finally:
+            # Clean up and reset GPIO settings
+            GPIO.cleanup()
 if __name__ == '__main__':
     main()
 

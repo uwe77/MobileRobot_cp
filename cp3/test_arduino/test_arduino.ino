@@ -31,6 +31,11 @@ double pwm_R = 0;
 double Setpoint_R = 0;
 int SpdMsgR = 0; // data of speed message for right motor
 
+ros::NodeHandle nh;
+std_msgs::Int32 input_msg;
+ros::Publisher lm393_pub("lm393_data", &input_msg);
+int lm393_pin = A0;
+
 // PID
 double Kp = 1.2, Ki = 8, Kd = 0; // 1.2, 8, 0
 PID motorLPID(&abs_count_L, &pwm_L, &Setpoint_L, Kp, Ki, Kd, DIRECT);
@@ -56,6 +61,7 @@ void setup(){
   nh.initNode();
   nh.subscribe(reciever_L);
   nh.subscribe(reciever_R);
+  nh.advertise(lm393_pub);
   
   // set left motor
   pinMode(pin_IN1, OUTPUT);
@@ -83,28 +89,32 @@ void setup(){
   motorLPID.SetMode(AUTOMATIC);
   Setpoint_R = 0.0;
   motorRPID.SetMode(AUTOMATIC);
+  
 }
 
 void loop(){
-  if(SpdMsgL != Setpoint_L){
-    Setpoint_L = double(abs(SpdMsgL));
-  }
-  if(SpdMsgL != Setpoint_R){
-    Setpoint_R = double(abs(SpdMsgR));
-  }
-  
-  abs_count_L = double(abs(count_L));
-  abs_count_R = double(abs(count_R));
-  motorLPID.Compute();
-  motorRPID.Compute();
-
-  set_motorL_speed();
-  set_motorR_speed();
-  
-  count_L = 0;
-  count_R = 0;
-  delay(100);
-  nh.spinOnce();
+    lm393_info = analogRead(lm393_pin);
+    input_msg.data = int(lm393_info);
+    lm393_pub.publish(&input_msg);
+    
+    if(SpdMsgL != Setpoint_L){
+        Setpoint_L = double(abs(SpdMsgL));
+    }
+    if(SpdMsgL != Setpoint_R){
+        Setpoint_R = double(abs(SpdMsgR));
+    }
+    
+    abs_count_L = double(abs(count_L));
+    abs_count_R = double(abs(count_R));
+    motorLPID.Compute();
+    motorRPID.Compute();
+    set_motorL_speed();
+    set_motorR_speed();
+    
+    count_L = 0;
+    count_R = 0;
+    delay(100);
+    nh.spinOnce();
 }
 
 
