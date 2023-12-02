@@ -6,7 +6,7 @@ import time
 def ir_sensor_reader():
     rospy.init_node('ir_sensor_reader', anonymous=True)
     ratio_pub = rospy.Publisher('ir_ratio', Float32, queue_size=10)
-    ir_sensor_pin = 15
+    ir_sensor_pin = 23
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(ir_sensor_pin, GPIO.IN)
     while not rospy.is_shutdown():
